@@ -1,37 +1,100 @@
+'use client';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
+import { useState } from 'react';
+import { RegisterFormType } from '@/core/types/forms/register_form';
+import axios from 'axios';
+import api from '@/core/api';
+import { useRouter } from 'next/navigation';
+export function RegisterForm({ className, ...props }: React.ComponentProps<'div'>) {
+    const router = useRouter();
+    const [loading, setLoading] = useState<boolean>(false);
+    const [registerForm, setRegisterForm] = useState<RegisterFormType>({
+        name: '',
+        pref_name: '',
+        email: '',
+        password: '',
+    });
+    const handleFormChange = (event: any) => {
+        event.preventDefault();
+        setRegisterForm({ ...registerForm, [event.target.name]: event.target.value });
+    };
+    const handleFormSubmit = async (event: any) => {
+        event.preventDefault();
+        setLoading(true);
+        try {
+            const { data } = await axios.post(api.auth.register(), registerForm);
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', data.user);
+            router.push('/dashboard');
+            setLoading(false);
+        } catch (error) {
+            console.error('Register failed:', error);
+            setLoading(false);
+        }
+    };
     return (
         <div className={cn('flex flex-col gap-6', className)} {...props}>
             <Card className='overflow-hidden'>
                 <CardContent className='grid p-0 md:grid-cols-2'>
-                    <form className='p-6 md:p-8'>
+                    <form className='p-6 md:p-8' onSubmit={(e) => handleFormSubmit(e)}>
                         <div className='flex flex-col gap-6'>
                             <div className='flex flex-col items-center text-center'>
-                                <h1 className='text-2xl font-bold'>Welcome back</h1>
+                                <h1 className='text-2xl font-bold'>Welcome!</h1>
                                 <p className='text-balance text-muted-foreground'>
-                                    Login to your{' '}
+                                    Let's create your{' '}
                                     <span className='font-bold'>{process.env.NEXT_PUBLIC_SCHOLARA_NAME}</span> account
                                 </p>
                             </div>
                             <div className='grid gap-2'>
-                                <Label htmlFor='email'>Email</Label>
-                                <Input id='email' type='email' placeholder='m@example.com' required />
+                                <Label htmlFor='name'>Full Legal Name</Label>
+                                <Input
+                                    id='name'
+                                    name='name'
+                                    type='text'
+                                    placeholder='John H. Doe'
+                                    required
+                                    onChange={(e) => handleFormChange(e)}
+                                />
+                            </div>
+                            <div className='grid gap-2'>
+                                <Label htmlFor='name'>Preferred Name</Label>
+                                <Input
+                                    id='name'
+                                    name='pref_name'
+                                    type='text'
+                                    placeholder='John D'
+                                    required
+                                    onChange={(e) => handleFormChange(e)}
+                                />
+                            </div>
+                            <div className='grid gap-2'>
+                                <Label htmlFor='name'>Email</Label>
+                                <Input
+                                    id='name'
+                                    name='email'
+                                    type='email'
+                                    placeholder='John D'
+                                    required
+                                    onChange={(e) => handleFormChange(e)}
+                                />
                             </div>
                             <div className='grid gap-2'>
                                 <div className='flex items-center'>
                                     <Label htmlFor='password'>Password</Label>
-                                    <a href='#' className='ml-auto text-sm underline-offset-2 hover:underline'>
-                                        Forgot your password?
-                                    </a>
                                 </div>
-                                <Input id='password' type='password' required />
+                                <Input
+                                    id='password'
+                                    name='password'
+                                    type='password'
+                                    required
+                                    onChange={(e) => handleFormChange(e)}
+                                />
                             </div>
-                            <Button type='submit' className='w-full'>
+                            <Button type='submit' className='w-full' disabled={loading}>
                                 Login
                             </Button>
                             <div className='relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border'>

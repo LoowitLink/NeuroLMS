@@ -30,6 +30,9 @@ info!("Starting server");
 let app = Router::new()
 .route("/", get(root))
 .route("/ver", get(ver))
+.route("/api/users/count", get(api::users::user_count::return_total_users))
+.route("/api/auth/register", post(api::users::register_user::user_register_service))
+.route("/api/user/account", get(api::users::my_account_data::user_fetch_data_service))
 .layer(Extension(db))
 .layer(
     CorsLayer::new()

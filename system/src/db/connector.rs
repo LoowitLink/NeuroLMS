@@ -1,19 +1,9 @@
 use std::env;
-extern crate dotenv;
-use crate::db::models::user::User;
-use chrono::Utc;
 use dotenv::dotenv;
-use lettre::transport::smtp::response::Code;
-use rand::{distributions::Alphanumeric, Rng, RngCore};
-use sha2::{digest::{typenum::Or, Update}, Digest, Sha256};
-use mongodb::{
-    bson::{self, doc, oid::ObjectId, Bson, Document, Uuid}, error::Error, results::{InsertOneResult, UpdateResult}, sync::{Client, Collection}
-};
-use anyhow::{Result, Context};
-
+use mongodb::{bson::Document, sync::{Client, Collection}};
 
 pub struct MongoRepo {
-    col_users: Collection<Document>,
+    pub col_users: Collection<Document>,
 }
 
 impl MongoRepo {
@@ -25,11 +15,4 @@ impl MongoRepo {
         let col_users: Collection<Document> = db.collection("users");
         MongoRepo { col_users }
     }
-
-    pub fn count_user_documents(&self, filter: Document) -> Result<i64, Error> {
-        let count_result = self.col_users.count_documents(filter, None)?;
-        Ok(count_result as i64)
-    }
-
-
 }
