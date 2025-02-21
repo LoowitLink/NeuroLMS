@@ -1,0 +1,5 @@
+/system/.sqlx
+/system/target
+/app/.next
+/app/node_modules
+/app/README.md
