@@ -1,0 +1,51 @@
+name: Code Checks for Next.js and Rust
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    code-checks:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            # Next.js (app) Code Checks
+            - name: Set up Node.js for Next.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '22' # Or specify your Node.js version
+
+            - name: Install dependencies for Next.js
+              working-directory: ./app
+              run: |
+                  npm install --legacy-peer-deps
+
+            - name: Run Next.js lint
+              working-directory: ./app
+              run: npm run lint
+
+            - name: Run Next.js tests
+              working-directory: ./app
+              run: npm test -- --coverage
+
+            # Rust (system) Code Checks
+            - name: Set up Rust for system
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+
+            - name: Install Clippy for Rust
+              run: rustup component add clippy
+
+            - name: Run Clippy (linting) for Rust
+              run: cargo clippy --manifest-path ./system/Cargo.toml -- -D warnings
+
+            - name: Run Tests for Rust
+              run: cargo test --manifest-path ./system/Cargo.toml
