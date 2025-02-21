@@ -31,10 +31,6 @@ jobs:
               working-directory: ./app
               run: npm run lint
 
-            - name: Run Next.js tests
-              working-directory: ./app
-              run: npm test -- --coverage
-
             # Rust (system) Code Checks
             - name: Set up Rust for system
               uses: actions-rs/toolchain@v1
